@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import ttk
+import tkcalendar
 
 entry_rows = []
 next_row_id = 0
@@ -11,7 +12,10 @@ class EntryRow:
         self.id = next_row_id
         next_row_id += 1
 
+        self.score = tkinter.IntVar()
         self.widgets = [ttk.Entry(frame),
+                        ttk.Entry(frame, textvariable=self.score),
+                        tkcalendar.DateEntry(frame),
                         ttk.Button(frame, text="Удалить", command=lambda: remove_row(self.id))]
 
     def forget(self):
