@@ -22,14 +22,18 @@ class Tasks:
 
     class EntryRow:
         def __init__(self, tasks):
+            self.tasks = tasks
+
             self.id = tasks.next_row_id
             tasks.next_row_id += 1
 
             self.score = tkinter.IntVar()
             self.widgets = [ttk.Entry(tasks.task_entries),
+                            ttk.Combobox(tasks.task_entries),
                             ttk.Entry(tasks.task_entries, textvariable=self.score),
                             tkcalendar.DateEntry(tasks.task_entries),
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
+            self.update_combobox()
 
         def forget(self):
             for widget in self.widgets:
@@ -38,6 +42,9 @@ class Tasks:
         def grid(self, row):
             for j in range(len(self.widgets)):
                 self.widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
+
+        def update_combobox(self):
+            self.widgets[1]['values'] = self.tasks.subjects.subject_names()
 
     def remove_row(self, deleted):
         for row in self.entry_rows:
@@ -56,3 +63,7 @@ class Tasks:
 
         for i in range(len(self.entry_rows)):
             self.entry_rows[i].grid(i)
+
+    def subject_renamed(self):
+        for row in self.entry_rows:
+            row.update_combobox()

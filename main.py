@@ -1,5 +1,5 @@
-import subjects
-import tasks
+from subjects import Subjects
+from tasks import Tasks
 
 import tkinter
 from tkinter import ttk
@@ -12,7 +12,10 @@ if __name__ == '__main__':
     notebook = ttk.Notebook()
     notebook.pack(expand=True, fill=tkinter.BOTH)
 
-    tasks.Tasks(notebook)
-    subjects.Subjects(notebook)
+    subjects = Subjects(notebook)
+    tasks = Tasks(notebook)
+
+    subjects.tasks = tasks
+    tasks.subjects = subjects
 
     window.mainloop()

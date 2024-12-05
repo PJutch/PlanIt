@@ -24,8 +24,10 @@ class Subjects:
             self.id = subjects.next_row_id
             subjects.next_row_id += 1
 
+            self.name = tkinter.StringVar()
+            self.name.trace_add('write', lambda name, index, mode, sv=self.name: subjects.tasks.subject_renamed())
             self.score = tkinter.IntVar()
-            self.widgets = [ttk.Entry(subjects.entries),
+            self.widgets = [ttk.Entry(subjects.entries, textvariable=self.name),
                             ttk.Entry(subjects.entries, textvariable=self.score),
                             ttk.Button(subjects.entries, text="Удалить", command=lambda: subjects.remove_row(self.id))]
 
@@ -46,6 +48,8 @@ class Subjects:
         for i in range(len(self.entry_rows)):
             self.entry_rows[i].grid(i)
 
+        self.tasks.subject_renamed()
+
     def add_row(self):
         for row in self.entry_rows:
             row.forget()
@@ -54,3 +58,6 @@ class Subjects:
 
         for i in range(len(self.entry_rows)):
             self.entry_rows[i].grid(i)
+
+    def subject_names(self):
+        return [row.name.get() for row in self.entry_rows if row.name.get() and not row.name.get().isspace()]
