@@ -59,38 +59,32 @@ class Tasks:
         def update_combobox(self):
             self.subject['values'] = self.tasks.subjects.subject_names()
 
-    def remove_row(self, deleted):
+    def forget_all(self):
         for row in self.entry_rows:
             row.forget()
 
-        self.entry_rows = [row for row in self.entry_rows if row.id != deleted]
-
+    def grid_all(self):
         for i in range(len(self.entry_rows)):
             self.entry_rows[i].grid(i)
+
+    def remove_row(self, deleted):
+        self.forget_all()
+        self.entry_rows = [row for row in self.entry_rows if row.id != deleted]
+        self.grid_all()
 
     def add_row(self):
-        for row in self.entry_rows:
-            row.forget()
-
+        self.forget_all()
         self.entry_rows.append(self.EntryRow(self))
-
-        for i in range(len(self.entry_rows)):
-            self.entry_rows[i].grid(i)
+        self.grid_all()
 
     def subject_renamed(self):
         for row in self.entry_rows:
             row.update_combobox()
 
     def sort(self):
-        for row in self.entry_rows:
-            row.forget()
-
+        self.forget_all()
         random.shuffle(self.entry_rows)
-
-        for i in range(len(self.entry_rows)):
-            self.entry_rows[i].grid(i)
+        self.grid_all()
 
     def clear(self):
-        for row in self.entry_rows:
-            row.forget()
-
+        self.forget_all()
