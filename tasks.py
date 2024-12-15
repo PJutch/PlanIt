@@ -91,3 +91,4 @@ class Tasks:
 
     def clear(self):
         self.forget_all()
+        self.entry_rows = []

@@ -73,3 +73,4 @@ class Subjects:
 
     def clear(self):
         self.forget_all()
+        self.entry_rows = []
