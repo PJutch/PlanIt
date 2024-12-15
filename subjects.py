@@ -17,6 +17,9 @@ class Subjects:
         add_button = ttk.Button(subjects, text="Добавить", command=self.add_row)
         add_button.pack(anchor=tkinter.N, padx=6, pady=6)
 
+        clear_button = ttk.Button(subjects, text="Очистить", command=self.clear)
+        clear_button.pack(anchor=tkinter.N, padx=6, pady=6)
+
         notebook.add(subjects, text="Предметы")
 
     class EntryRow:
@@ -63,3 +66,7 @@ class Subjects:
 
     def subject_names(self):
         return [row.name.get() for row in self.entry_rows if row.name.get() and not row.name.get().isspace()]
+
+    def clear(self):
+        for row in self.entry_rows:
+            row.forget()
