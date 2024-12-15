@@ -1,3 +1,4 @@
+import random
 import tkinter
 from tkinter import ttk
 import tkcalendar
@@ -17,6 +18,9 @@ class Tasks:
 
         add_button = ttk.Button(tasks, text="Добавить", command=self.add_row)
         add_button.pack(anchor=tkinter.N, padx=6, pady=6)
+
+        sort_button = ttk.Button(tasks, text="Plan It!", command=self.sort)
+        sort_button.pack(anchor=tkinter.N, padx=6, pady=6)
 
         notebook.add(tasks, text="Домашки")
 
@@ -73,3 +77,12 @@ class Tasks:
     def subject_renamed(self):
         for row in self.entry_rows:
             row.update_combobox()
+
+    def sort(self):
+        for row in self.entry_rows:
+            row.forget()
+
+        random.shuffle(self.entry_rows)
+
+        for i in range(len(self.entry_rows)):
+            self.entry_rows[i].grid(i)
