@@ -22,6 +22,9 @@ class Tasks:
         sort_button = ttk.Button(tasks, text="Plan It!", command=self.sort)
         sort_button.pack(anchor=tkinter.N, padx=6, pady=6)
 
+        clear_button = ttk.Button(tasks, text="Очистить", command=self.clear)
+        clear_button.pack(anchor=tkinter.N, padx=6, pady=6)
+
         notebook.add(tasks, text="Домашки")
 
     class EntryRow:
@@ -86,3 +89,8 @@ class Tasks:
 
         for i in range(len(self.entry_rows)):
             self.entry_rows[i].grid(i)
+
+    def clear(self):
+        for row in self.entry_rows:
+            row.forget()
+
