@@ -11,7 +11,7 @@ class Subjects:
         subjects.pack()
 
         self.entries = ttk.Frame(subjects)
-        self.entries.columnconfigure(0, weight=1)
+        self.entries.columnconfigure(1, weight=1)
         self.entries.pack(fill=tkinter.X)
 
         add_button = ttk.Button(subjects, text="Добавить", command=self.add_row)
@@ -27,7 +27,9 @@ class Subjects:
             self.name = tkinter.StringVar()
             self.name.trace_add('write', lambda name, index, mode, sv=self.name: subjects.tasks.subject_renamed())
             self.score = tkinter.IntVar()
-            self.widgets = [ttk.Entry(subjects.entries, textvariable=self.name),
+            self.widgets = [ttk.Label(subjects.entries, text='Название:'),
+                            ttk.Entry(subjects.entries, textvariable=self.name),
+                            ttk.Label(subjects.entries, text='Целевой балл:'),
                             ttk.Entry(subjects.entries, textvariable=self.score),
                             ttk.Button(subjects.entries, text="Удалить", command=lambda: subjects.remove_row(self.id))]
 

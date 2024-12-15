@@ -12,7 +12,7 @@ class Tasks:
         tasks.pack()
 
         self.task_entries = ttk.Frame(tasks)
-        self.task_entries.columnconfigure(0, weight=1)
+        self.task_entries.columnconfigure(1, weight=1)
         self.task_entries.pack(fill=tkinter.X)
 
         add_button = ttk.Button(tasks, text="Добавить", command=self.add_row)
@@ -27,10 +27,16 @@ class Tasks:
             self.id = tasks.next_row_id
             tasks.next_row_id += 1
 
+            self.subject = ttk.Combobox(tasks.task_entries)
+
             self.score = tkinter.IntVar()
-            self.widgets = [ttk.Entry(tasks.task_entries),
-                            ttk.Combobox(tasks.task_entries),
+            self.widgets = [ttk.Label(tasks.task_entries, text='Название:'),
+                            ttk.Entry(tasks.task_entries),
+                            ttk.Label(tasks.task_entries, text='Предмет:'),
+                            self.subject,
+                            ttk.Label(tasks.task_entries, text='Баллы:'),
                             ttk.Entry(tasks.task_entries, textvariable=self.score),
+                            ttk.Label(tasks.task_entries, text='Дедлайн:'),
                             tkcalendar.DateEntry(tasks.task_entries),
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
             self.update_combobox()
@@ -44,7 +50,7 @@ class Tasks:
                 self.widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
 
         def update_combobox(self):
-            self.widgets[1]['values'] = self.tasks.subjects.subject_names()
+            self.subject['values'] = self.tasks.subjects.subject_names()
 
     def remove_row(self, deleted):
         for row in self.entry_rows:
