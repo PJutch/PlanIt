@@ -16,14 +16,17 @@ class Tasks:
         self.task_entries.columnconfigure(1, weight=1)
         self.task_entries.pack(fill=tkinter.X)
 
-        add_button = ttk.Button(tasks, text="Добавить", command=self.add_row)
-        add_button.pack(anchor=tkinter.N, padx=6, pady=6)
+        buttons = ttk.Frame(tasks)
+        buttons.pack()
 
-        sort_button = ttk.Button(tasks, text="Plan It!", command=self.sort)
-        sort_button.pack(anchor=tkinter.N, padx=6, pady=6)
+        add_button = ttk.Button(buttons, text="Добавить", command=self.add_row)
+        add_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
-        clear_button = ttk.Button(tasks, text="Очистить", command=self.clear)
-        clear_button.pack(anchor=tkinter.N, padx=6, pady=6)
+        sort_button = ttk.Button(buttons, text="Plan It!", command=self.sort)
+        sort_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
+
+        clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
+        clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(tasks, text="Домашки")
 

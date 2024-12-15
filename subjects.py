@@ -16,11 +16,14 @@ class Subjects:
         self.entries.columnconfigure(1, weight=1)
         self.entries.pack(fill=tkinter.X)
 
-        add_button = ttk.Button(subjects, text="Добавить", command=self.add_row)
-        add_button.pack(anchor=tkinter.N, padx=6, pady=6)
+        buttons = ttk.Frame(subjects)
+        buttons.pack()
 
-        clear_button = ttk.Button(subjects, text="Очистить", command=self.clear)
-        clear_button.pack(anchor=tkinter.N, padx=6, pady=6)
+        add_button = ttk.Button(buttons, text="Добавить", command=self.add_row)
+        add_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
+
+        clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
+        clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(subjects, text="Предметы")
 
