@@ -156,6 +156,6 @@ class Tasks:
         self.entry_rows = []
 
     def tasks(self):
-        return [plan.Task(row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
+        return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
                           (row.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
                 for row in self.entry_rows]

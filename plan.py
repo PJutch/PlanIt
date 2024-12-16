@@ -1,7 +1,7 @@
 import copy
 import collections
 
-Task = collections.namedtuple('Tasks', ['name', 'subject', 'score', 'time', 'deadline'])
+Task = collections.namedtuple('Tasks', ['done', 'name', 'subject', 'score', 'time', 'deadline'])
 
 
 def score(current_score: dict[str, int], target_score: dict[str, int]):
@@ -11,10 +11,14 @@ def score(current_score: dict[str, int], target_score: dict[str, int]):
 
 
 def plan(current_time: int, target_score: dict[str, int], tasks: list[Task]) -> list[int]:
+    for task in tasks:
+        if task.done:
+            target_score[task.subject] -= task.score
+
     dp = [{current_time: {subject: 0 for subject in target_score.keys()}}]
     is_taken = [{}]
 
-    order = sorted(range(len(tasks)), key=lambda i: tasks[i].deadline)
+    order = sorted((i for i in range(len(tasks)) if not tasks[i].done), key=lambda i: tasks[i].deadline)
     for task_idx in order:
         dp.append(copy.copy(dp[-1]))
         is_taken.append({time: False for time in dp[-1]})
