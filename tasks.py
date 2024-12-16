@@ -40,12 +40,16 @@ class Tasks:
             self.subject = ttk.Combobox(tasks.task_entries)
 
             self.score = tkinter.IntVar()
+            self.time = tkinter.IntVar()
+
             self.widgets = [ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
                             self.subject,
                             ttk.Label(tasks.task_entries, text='Баллы:'),
                             ttk.Entry(tasks.task_entries, textvariable=self.score),
+                            ttk.Label(tasks.task_entries, text='Часы бота:'),
+                            ttk.Entry(tasks.task_entries, textvariable=self.time),
                             ttk.Label(tasks.task_entries, text='Дедлайн:'),
                             tkcalendar.DateEntry(tasks.task_entries),
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
