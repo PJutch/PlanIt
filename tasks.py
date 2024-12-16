@@ -62,7 +62,8 @@ class Tasks:
             self.time = tkinter.IntVar()
             self.deadline = tkcalendar.DateEntry(tasks.task_entries)
 
-            self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done),
+            self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done,
+                                            command=lambda: self.gray_out() if self.done.get() else self.ungray_out()),
                             ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
@@ -89,7 +90,7 @@ class Tasks:
 
         def gray_out(self):
             for widget in self.widgets:
-                if isinstance(widget, ttk.Combobox):
+                if isinstance(widget, ttk.Checkbutton):
                     widget['style'] = 'Gray.TCheckbutton'
                 elif isinstance(widget, ttk.Label):
                     widget['style'] = 'Gray.TLabel'
@@ -102,7 +103,7 @@ class Tasks:
 
         def ungray_out(self):
             for widget in self.widgets:
-                if isinstance(widget, ttk.Combobox):
+                if isinstance(widget, ttk.Checkbutton):
                     widget['style'] = 'TCheckbutton'
                 elif isinstance(widget, ttk.Label):
                     widget['style'] = 'TLabel'
