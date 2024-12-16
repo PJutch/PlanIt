@@ -39,6 +39,7 @@ class Tasks:
 
         notebook.add(tasks, text="Домашки")
 
+        make_gray_style('TCheckbutton')
         make_gray_style('TLabel')
         make_gray_style('TEntry')
         make_gray_style('TCombobox')
@@ -53,12 +54,16 @@ class Tasks:
 
             self.subject = ttk.Combobox(tasks.task_entries)
 
+            self.done = tkinter.BooleanVar()
+            self.done.set(False)
+
             self.name = tkinter.StringVar()
             self.score = tkinter.IntVar()
             self.time = tkinter.IntVar()
             self.deadline = tkcalendar.DateEntry(tasks.task_entries)
 
-            self.widgets = [ttk.Label(tasks.task_entries, text='Название:'),
+            self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done),
+                            ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
                             self.subject,
@@ -84,7 +89,9 @@ class Tasks:
 
         def gray_out(self):
             for widget in self.widgets:
-                if isinstance(widget, ttk.Label):
+                if isinstance(widget, ttk.Combobox):
+                    widget['style'] = 'Gray.TCheckbutton'
+                elif isinstance(widget, ttk.Label):
                     widget['style'] = 'Gray.TLabel'
                 elif isinstance(widget, ttk.Entry):
                     widget['style'] = 'Gray.TEntry'
@@ -95,7 +102,9 @@ class Tasks:
 
         def ungray_out(self):
             for widget in self.widgets:
-                if isinstance(widget, ttk.Label):
+                if isinstance(widget, ttk.Combobox):
+                    widget['style'] = 'TCheckbutton'
+                elif isinstance(widget, ttk.Label):
                     widget['style'] = 'TLabel'
                 elif isinstance(widget, ttk.Entry):
                     widget['style'] = 'TEntry'
