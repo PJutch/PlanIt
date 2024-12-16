@@ -7,6 +7,11 @@ import tkcalendar
 import plan
 
 
+def make_gray_style(base):
+    style = ttk.Style()
+    style.configure(f'Gray.{base}', foreground='gray')
+
+
 class Tasks:
     def __init__(self, notebook):
         self.subjects = None
@@ -33,6 +38,11 @@ class Tasks:
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(tasks, text="Домашки")
+
+        make_gray_style('TLabel')
+        make_gray_style('TEntry')
+        make_gray_style('TCombobox')
+        make_gray_style('TButton')
 
     class EntryRow:
         def __init__(self, tasks):
@@ -72,6 +82,28 @@ class Tasks:
         def update_combobox(self):
             self.subject['values'] = self.tasks.subjects.subject_names()
 
+        def gray_out(self):
+            for widget in self.widgets:
+                if isinstance(widget, ttk.Label):
+                    widget['style'] = 'Gray.TLabel'
+                elif isinstance(widget, ttk.Entry):
+                    widget['style'] = 'Gray.TEntry'
+                elif isinstance(widget, ttk.Combobox):
+                    widget['style'] = 'Gray.TCombobox'
+                elif isinstance(widget, ttk.Button):
+                    widget['style'] = 'Gray.TButton'
+
+        def ungray_out(self):
+            for widget in self.widgets:
+                if isinstance(widget, ttk.Label):
+                    widget['style'] = 'TLabel'
+                elif isinstance(widget, ttk.Entry):
+                    widget['style'] = 'TEntry'
+                elif isinstance(widget, ttk.Combobox):
+                    widget['style'] = 'TCombobox'
+                elif isinstance(widget, ttk.Button):
+                    widget['style'] = 'TButton'
+
     def forget_all(self):
         for row in self.entry_rows:
             row.forget()
@@ -96,10 +128,17 @@ class Tasks:
 
     def sort(self):
         self.forget_all()
+
         order = plan.plan(int(datetime.datetime.now().timestamp() / 3600),
                           self.subjects.target_scores(), self.tasks())
+
+        for row in self.entry_rows:
+            row.gray_out()
+        for i in order:
+            self.entry_rows[i].ungray_out()
         self.entry_rows = ([self.entry_rows[i] for i in order]
                            + [entry_row for i, entry_row in enumerate(self.entry_rows) if i not in order])
+
         self.grid_all()
 
     def clear(self):
