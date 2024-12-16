@@ -1,53 +1,44 @@
 import copy
 import collections
 
-
 Task = collections.namedtuple('Tasks', ['name', 'subject', 'score', 'time', 'deadline'])
 
 
+def score(current_score: dict[str, int], target_score: dict[str, int]):
+    target = sum(min(target_score[subject], current_score[subject]) for subject in target_score)
+    extra = sum(max(current_score[subject] - target_score[subject], 0) for subject in target_score)
+    return target, extra
+
+
 def plan(current_time: int, target_score: dict[str, int], tasks: list[Task]) -> list[int]:
-    reached_score = {subject: 0 for subject in target_score}
-    for task in tasks:
-        reached_score[task.subject] += task.score
+    dp = [{current_time: {subject: 0 for subject in target_score.keys()}}]
+    is_taken = [{}]
 
-    order = sorted((i for i in range(len(tasks))), key=lambda index: tasks[index].deadline)
-    done_tasks = []
-    for i in order:
-        if current_time + tasks[i].time <= tasks[i].deadline:
-            done_tasks.append(i)
-            current_time += tasks[i].time
-        else:
-            rollback_time = current_time
-            will_cancel = []
-            for cancelled in reversed(done_tasks):
-                if rollback_time + tasks[i].time <= tasks[i].deadline:
-                    break
+    order = sorted(range(len(tasks)), key=lambda i: tasks[i].deadline)
+    for task_idx in order:
+        dp.append(copy.copy(dp[-1]))
+        is_taken.append({time: False for time in dp[-1]})
 
-                rollback_time -= tasks[cancelled].time
-                will_cancel.append(cancelled)
+        for time, scores in dp[-2].items():
+            end_time = time + tasks[task_idx].time
+            if end_time > tasks[task_idx].deadline:
+                continue
 
-            score_after_cancel = copy.copy(reached_score)
-            for cancelled in will_cancel:
-                score_after_cancel[tasks[cancelled].subject] -= tasks[cancelled].score
+            new_current_score = copy.copy(scores)
+            new_current_score[tasks[task_idx].subject] += tasks[task_idx].score
 
-            target_losses = sum(max(target_score[subject] - score_after_cancel[subject], 0)
-                                for subject in target_score)
-            extra_losses = sum(max(reached_score[subject] - max(target_score[subject], score_after_cancel[subject]), 0)
-                               for subject in target_score)
+            if end_time not in dp[-1] or score(new_current_score, target_score) > score(dp[-1][end_time], target_score):
+                dp[-1][end_time] = new_current_score
+                is_taken[-1][end_time] = True
 
-            subject = tasks[i].subject
-            target_benefit = max(target_score[subject] - reached_score[subject] + tasks[i].score, 0)
-            extra_benefit = max(min(tasks[i].score, reached_score[subject] - target_score[subject]), 0)
+    best = None
+    for time, scores in dp[-1].items():
+        if best is None or score(scores, target_score) > score(dp[-1][best], target_score):
+            best = time
 
-            if target_benefit > target_losses or target_benefit == target_losses and extra_benefit > extra_losses:
-                for cancelled in will_cancel:
-                    reached_score[tasks[cancelled].subject] -= tasks[cancelled].score
-
-                done_tasks = done_tasks[:-len(will_cancel)]
-                done_tasks.append(i)
-
-                current_time = rollback_time + tasks[i].time
-            else:
-                reached_score[subject] -= tasks[i].score
-
-    return done_tasks
+    taken = []
+    for i in range(len(dp) - 1, 0, -1):
+        if is_taken[i][best]:
+            best -= tasks[order[i - 1]].time
+            taken.append(order[i - 1])
+    return list(reversed(taken))
