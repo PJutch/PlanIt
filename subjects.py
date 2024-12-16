@@ -74,3 +74,6 @@ class Subjects:
     def clear(self):
         self.forget_all()
         self.entry_rows = []
+
+    def target_scores(self):
+        return {subject.name.get(): subject.score.get() for subject in self.entry_rows}

@@ -1,12 +1,16 @@
-import random
+import datetime
 import tkinter
 from tkinter import ttk
+
 import tkcalendar
+
+import plan
 
 
 class Tasks:
     def __init__(self, notebook):
-        self.entry_rows = []
+        self.subjects = None
+        self.entry_rows: list[Tasks.EntryRow] = []
         self.next_row_id = 0
 
         tasks = ttk.Frame(notebook)
@@ -39,8 +43,10 @@ class Tasks:
 
             self.subject = ttk.Combobox(tasks.task_entries)
 
+            self.name = tkinter.StringVar()
             self.score = tkinter.IntVar()
             self.time = tkinter.IntVar()
+            self.deadline = tkcalendar.DateEntry(tasks.task_entries)
 
             self.widgets = [ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
@@ -51,7 +57,7 @@ class Tasks:
                             ttk.Label(tasks.task_entries, text='Часы бота:'),
                             ttk.Entry(tasks.task_entries, textvariable=self.time),
                             ttk.Label(tasks.task_entries, text='Дедлайн:'),
-                            tkcalendar.DateEntry(tasks.task_entries),
+                            self.deadline,
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
             self.update_combobox()
 
@@ -90,9 +96,17 @@ class Tasks:
 
     def sort(self):
         self.forget_all()
-        random.shuffle(self.entry_rows)
+        order = plan.plan(int(datetime.datetime.now().timestamp() / 3600),
+                          self.subjects.target_scores(), self.tasks())
+        self.entry_rows = ([self.entry_rows[i] for i in order]
+                           + [entry_row for i, entry_row in enumerate(self.entry_rows) if i not in order])
         self.grid_all()
 
     def clear(self):
         self.forget_all()
         self.entry_rows = []
+
+    def tasks(self):
+        return [plan.Task(row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
+                          (row.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
+                for row in self.entry_rows]
