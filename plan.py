@@ -25,7 +25,7 @@ def plan(current_time: int, target_score: dict[str, int], tasks: list[Task]) -> 
 
         for time, scores in dp[-2].items():
             end_time = time + tasks[task_idx].time
-            if end_time > tasks[task_idx].deadline:
+            if tasks[task_idx].subject not in target_score or end_time > tasks[task_idx].deadline:
                 continue
 
             new_current_score = copy.copy(scores)
