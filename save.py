@@ -3,7 +3,8 @@ import json
 
 def save(subjects, tasks):
     with open('save.json', 'w') as f:
-        json.dump({'subjects': subjects.target_scores(), 'tasks': tasks.saved_data()}, f, ensure_ascii=True, indent=4)
+        json.dump({'subjects': subjects.saved_data(), 'tasks': tasks.saved_data()}, f,
+                  ensure_ascii=True, indent=4)
 
 
 def load(subjects, tasks):

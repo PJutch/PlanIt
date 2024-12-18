@@ -62,6 +62,10 @@ class Subjects(tab.Tab):
     def target_scores(self):
         return {subject.name.get(): subject.get_target_score() for subject in self.entry_rows}
 
+    def saved_data(self):
+        return [{'name': subject.name.get(), 'target_score': subject.get_target_score()}
+                for subject in self.entry_rows]
+
     def add_score(self, subject, score):
         for row in self.entry_rows:
             if row.name.get() == subject:
@@ -69,10 +73,10 @@ class Subjects(tab.Tab):
                 row.score_label['text'] = row.score_text()
 
     def load_data(self, data):
-        for name, target_score in data.items():
+        for row in data:
             self.add_row()
-            self.entry_rows[-1].name.set(name)
-            self.entry_rows[-1].score.set(target_score)
+            self.entry_rows[-1].name.set(row['name'])
+            self.entry_rows[-1].score.set(row['target_score'])
 
     def subject_renamed(self):
         self.app.mark_changed()
