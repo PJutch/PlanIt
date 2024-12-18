@@ -14,6 +14,32 @@ def make_gray_style(base):
     style.configure(f'Gray.{base}', foreground='gray')
 
 
+def set_gray_style(widget):
+    if isinstance(widget, ttk.Checkbutton):
+        widget['style'] = 'Gray.TCheckbutton'
+    elif isinstance(widget, ttk.Label):
+        widget['style'] = 'Gray.TLabel'
+    elif isinstance(widget, ttk.Entry):
+        widget['style'] = 'Gray.TEntry'
+    elif isinstance(widget, ttk.Combobox):
+        widget['style'] = 'Gray.TCombobox'
+    elif isinstance(widget, ttk.Button):
+        widget['style'] = 'Gray.TButton'
+
+
+def set_normal_style(widget):
+    if isinstance(widget, ttk.Checkbutton):
+        widget['style'] = 'TCheckbutton'
+    elif isinstance(widget, ttk.Label):
+        widget['style'] = 'TLabel'
+    elif isinstance(widget, ttk.Entry):
+        widget['style'] = 'TEntry'
+    elif isinstance(widget, ttk.Combobox):
+        widget['style'] = 'TCombobox'
+    elif isinstance(widget, ttk.Button):
+        widget['style'] = 'TButton'
+
+
 class Tasks(tab.Tab):
     def __init__(self, notebook, app):
         super().__init__(Tasks.EntryRow, app)
@@ -75,29 +101,11 @@ class Tasks(tab.Tab):
 
             def gray_out(self):
                 for widget in self.widgets:
-                    if isinstance(widget, ttk.Checkbutton):
-                        widget['style'] = 'Gray.TCheckbutton'
-                    elif isinstance(widget, ttk.Label):
-                        widget['style'] = 'Gray.TLabel'
-                    elif isinstance(widget, ttk.Entry):
-                        widget['style'] = 'Gray.TEntry'
-                    elif isinstance(widget, ttk.Combobox):
-                        widget['style'] = 'Gray.TCombobox'
-                    elif isinstance(widget, ttk.Button):
-                        widget['style'] = 'Gray.TButton'
+                    set_gray_style(widget)
 
             def ungray_out(self):
                 for widget in self.widgets:
-                    if isinstance(widget, ttk.Checkbutton):
-                        widget['style'] = 'TCheckbutton'
-                    elif isinstance(widget, ttk.Label):
-                        widget['style'] = 'TLabel'
-                    elif isinstance(widget, ttk.Entry):
-                        widget['style'] = 'TEntry'
-                    elif isinstance(widget, ttk.Combobox):
-                        widget['style'] = 'TCombobox'
-                    elif isinstance(widget, ttk.Button):
-                        widget['style'] = 'TButton'
+                    set_normal_style(widget)
 
             def marked_done(self):
                 self.row.update_done()
@@ -170,29 +178,11 @@ class Tasks(tab.Tab):
 
         def gray_out(self):
             for widget in self.widgets:
-                if isinstance(widget, ttk.Checkbutton):
-                    widget['style'] = 'Gray.TCheckbutton'
-                elif isinstance(widget, ttk.Label):
-                    widget['style'] = 'Gray.TLabel'
-                elif isinstance(widget, ttk.Entry):
-                    widget['style'] = 'Gray.TEntry'
-                elif isinstance(widget, ttk.Combobox):
-                    widget['style'] = 'Gray.TCombobox'
-                elif isinstance(widget, ttk.Button):
-                    widget['style'] = 'Gray.TButton'
+                set_gray_style(widget)
 
         def ungray_out(self):
             for widget in self.widgets:
-                if isinstance(widget, ttk.Checkbutton):
-                    widget['style'] = 'TCheckbutton'
-                elif isinstance(widget, ttk.Label):
-                    widget['style'] = 'TLabel'
-                elif isinstance(widget, ttk.Entry):
-                    widget['style'] = 'TEntry'
-                elif isinstance(widget, ttk.Combobox):
-                    widget['style'] = 'TCombobox'
-                elif isinstance(widget, ttk.Button):
-                    widget['style'] = 'TButton'
+                set_normal_style(widget)
 
         def marked_done(self):
             self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
