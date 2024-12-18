@@ -180,9 +180,21 @@ class Tasks(tab.Tab):
             for widget in self.widgets:
                 set_gray_style(widget)
 
+        def gray_out_all(self):
+            self.gray_out()
+            for subtask in self.subtasks:
+                subtask.gray_out()
+
         def ungray_out(self):
             for widget in self.widgets:
                 set_normal_style(widget)
+
+        def ungray_out_not_done(self):
+            for widget in self.widgets:
+                set_normal_style(widget)
+            for subtask in self.subtasks:
+                if not subtask.done.get():
+                    subtask.ungray_out()
 
         def marked_done(self):
             self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
@@ -281,9 +293,10 @@ class Tasks(tab.Tab):
                           self.app.subjects.target_scores(), self.tasks())
 
         for row in self.entry_rows:
-            row.gray_out()
+            row.gray_out_all()
         for i in order:
-            self.entry_rows[i].ungray_out()
+            self.entry_rows[i].ungray_out_not_done()
+
         self.entry_rows = ([self.entry_rows[i] for i in order]
                            + [entry_row for i, entry_row in enumerate(self.entry_rows) if i not in order])
 
