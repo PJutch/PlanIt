@@ -69,7 +69,7 @@ class Tasks(tab.Tab):
                                                 self.marked_done() if self.done.get()
                                                 else self.marked_not_done()),
                                 ttk.Label(row.subtask_frame, text='Название:'),
-                                ttk.Entry(row.subtask_frame),
+                                ttk.Entry(row.subtask_frame, textvariable=self.name),
                                 ttk.Button(row.subtask_frame, text="Удалить",
                                            command=lambda: row.remove_subtask(self.id))]
 
@@ -148,7 +148,7 @@ class Tasks(tab.Tab):
                                             self.marked_done() if self.done.get()
                                             else self.marked_not_done()),
                             ttk.Label(tasks.task_entries, text='Название:'),
-                            ttk.Entry(tasks.task_entries),
+                            ttk.Entry(tasks.task_entries, textvariable=self.name),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
                             self.subject,
                             ttk.Label(tasks.task_entries, text='Баллы:'),
