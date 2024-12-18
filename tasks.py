@@ -67,8 +67,8 @@ class Tasks(tab.Tab):
 
                 self.widgets = [ttk.Checkbutton(row.subtask_frame, variable=self.done,
                                                 command=lambda:
-                                                self.gray_out() if self.done.get()
-                                                else self.ungray_out()),
+                                                self.marked_done() if self.done.get()
+                                                else self.marked_not_done()),
                                 ttk.Label(row.subtask_frame, text='Название:'),
                                 ttk.Entry(row.subtask_frame),
                                 ttk.Button(row.subtask_frame, text="Удалить",
@@ -99,6 +99,14 @@ class Tasks(tab.Tab):
                         widget['style'] = 'TCombobox'
                     elif isinstance(widget, ttk.Button):
                         widget['style'] = 'TButton'
+
+            def marked_done(self):
+                self.row.update_done()
+                self.gray_out()
+
+            def marked_not_done(self):
+                self.row.update_done()
+                self.ungray_out()
 
             def forget(self):
                 for widget in self.widgets:
@@ -182,9 +190,28 @@ class Tasks(tab.Tab):
             self.tab.subjects.add_score(self.subject.get(), self.score.get())
             self.gray_out()
 
+            for subtask in self.subtasks:
+                subtask.done.set(True)
+                subtask.gray_out()
+
         def marked_not_done(self):
             self.tab.subjects.add_score(self.subject.get(), -self.score.get())
             self.ungray_out()
+
+            for subtask in self.subtasks:
+                subtask.done.set(False)
+                subtask.ungray_out()
+
+        def update_done(self):
+            done = all(subtask.done.get() for subtask in self.subtasks)
+            if done and not self.done.get():
+                self.done.set(True)
+                self.tab.subjects.add_score(self.subject.get(), self.score.get())
+                self.gray_out()
+            elif not done and self.done.get():
+                self.done.set(False)
+                self.tab.subjects.add_score(self.subject.get(), self.score.get())
+                self.ungray_out()
 
         def score_updated(self):
             if self.done.get():
