@@ -7,9 +7,16 @@ def save(subjects, tasks):
 
 
 def load(subjects, tasks):
-    with open('save.json', 'r') as f:
-        data = json.load(f)
-        if 'subjects' in data:
-            subjects.load_data(data['subjects'])
-        if 'tasks' in data:
-            tasks.load_data(data['tasks'])
+    try:
+        with open('save.json', 'r') as f:
+            data = json.load(f)
+            if 'subjects' in data:
+                subjects.load_data(data['subjects'])
+            if 'tasks' in data:
+                tasks.load_data(data['tasks'])
+    except FileNotFoundError:
+        pass
+    except json.decoder.JSONDecodeError:
+        pass
+    except ValueError:
+        pass
