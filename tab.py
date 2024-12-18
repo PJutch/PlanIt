@@ -2,9 +2,11 @@ import tkinter
 
 
 class Tab:
-    def __init__(self, row_type):
+    def __init__(self, row_type, app):
         self.entry_rows: list[row_type] = []
         self.next_row_id = 0
+
+        self.app = app
 
     class EntryRow:
         def __init__(self, tab):

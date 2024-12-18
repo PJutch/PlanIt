@@ -16,9 +16,7 @@ def make_gray_style(base):
 
 class Tasks(tab.Tab):
     def __init__(self, notebook, app):
-        super().__init__(Tasks.EntryRow)
-
-        self.app = app
+        super().__init__(Tasks.EntryRow, app)
 
         tasks = ttk.Frame(notebook)
         tasks.pack()

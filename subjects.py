@@ -6,9 +6,7 @@ import tab
 
 class Subjects(tab.Tab):
     def __init__(self, notebook, app):
-        super().__init__(Subjects.EntryRow)
-
-        self.app = app
+        super().__init__(Subjects.EntryRow, app)
 
         subjects = ttk.Frame(notebook)
         subjects.pack()
