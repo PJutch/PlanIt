@@ -165,7 +165,7 @@ class Tasks(tab.Tab):
                             ttk.Entry(tasks.task_entries, textvariable=self.time),
                             ttk.Label(tasks.task_entries, text='Дедлайн:'),
                             self.deadline,
-                            ttk.Button(tasks.task_entries, text="Добавить", command=self.add_subtask),
+                            ttk.Button(tasks.task_entries, text="Добавить подзадачу", command=self.add_subtask),
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
             self.update_combobox()
 
