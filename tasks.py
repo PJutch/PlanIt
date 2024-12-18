@@ -1,4 +1,5 @@
 import datetime
+import locale
 import tkinter
 from tkinter import ttk
 
@@ -62,7 +63,7 @@ class Tasks:
 
             self.name = tkinter.StringVar()
             self.time = tkinter.IntVar()
-            self.deadline = tkcalendar.DateEntry(tasks.task_entries)
+            self.deadline = tkcalendar.DateEntry(tasks.task_entries, locale=locale.getdefaultlocale()[0])
 
             self.score = tkinter.IntVar()
             self.score.trace_add('write', lambda name, index, mode: self.score_updated())
