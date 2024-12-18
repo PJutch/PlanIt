@@ -226,11 +226,15 @@ class Tasks(tab.Tab):
                 self.tab.app.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
             self.old_score = self.score.get()
 
+            self.tab.app.mark_changed()
+
         def subject_updated(self):
             if self.done.get():
                 self.tab.app.subjects.add_score(self.old_subject, -self.score.get())
                 self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
             self.old_subject = self.subject.get()
+
+            self.tab.app.mark_changed()
 
         def grid(self, row):
             for j in range(len(self.widgets)):
