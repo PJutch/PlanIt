@@ -1,6 +1,7 @@
 import datetime
 import locale
 import tkinter
+import babel.dates
 from tkinter import ttk
 
 import tkcalendar
@@ -199,7 +200,7 @@ class Tasks:
             'subject': row.subject.get(),
             'score': row.score.get(),
             'time': row.time.get(),
-            'date': row.deadline.get_date()
+            'deadline': babel.dates.format_date(row.deadline.get_date(), locale='en_US')
         } for row in self.entry_rows]
 
     def load_data(self, data):
@@ -210,4 +211,4 @@ class Tasks:
             self.entry_rows[-1].subject.set(row['subject'])
             self.entry_rows[-1].score.set(row['score'])
             self.entry_rows[-1].time.set(row['time'])
-            self.entry_rows[-1].deadline.set(row['date'])
+            self.entry_rows[-1].deadline.set_date(babel.dates.parse_date(row['deadline'], locale='en_US'))
