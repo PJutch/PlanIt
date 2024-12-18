@@ -95,7 +95,7 @@ class Subjects:
                 row.score_label['text'] = row.score_text()
 
     def load_data(self, data):
-        for name, target_score in data:
+        for name, target_score in data.items():
             self.add_row()
             self.entry_rows[-1].name.set(name)
             self.entry_rows[-1].score.set(target_score)

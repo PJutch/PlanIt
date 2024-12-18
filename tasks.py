@@ -1,7 +1,6 @@
 import datetime
 import locale
 import tkinter
-import babel.dates
 from tkinter import ttk
 
 import tkcalendar
@@ -76,8 +75,8 @@ class Tasks:
 
             self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done,
                                             command=lambda:
-                                                self.marked_done() if self.done.get()
-                                                else self.marked_not_done()),
+                                            self.marked_done() if self.done.get()
+                                            else self.marked_not_done()),
                             ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
@@ -200,7 +199,7 @@ class Tasks:
             'subject': row.subject.get(),
             'score': row.score.get(),
             'time': row.time.get(),
-            'deadline': babel.dates.format_date(row.deadline.get_date(), locale='en_US')
+            'deadline': row.deadline.get_date().isoformat()
         } for row in self.entry_rows]
 
     def load_data(self, data):
@@ -211,4 +210,4 @@ class Tasks:
             self.entry_rows[-1].subject.set(row['subject'])
             self.entry_rows[-1].score.set(row['score'])
             self.entry_rows[-1].time.set(row['time'])
-            self.entry_rows[-1].deadline.set_date(babel.dates.parse_date(row['deadline'], locale='en_US'))
+            self.entry_rows[-1].deadline.set_date(datetime.datetime.fromisoformat(row['deadline']))
