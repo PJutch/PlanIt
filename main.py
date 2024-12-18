@@ -14,16 +14,16 @@ class App:
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=tkinter.BOTH)
 
-        self.subjects = Subjects(notebook)
-        self.tasks = Tasks(notebook)
-
-        self.subjects.tasks = self.tasks
-        self.tasks.subjects = self.subjects
+        self.subjects = Subjects(notebook, self)
+        self.tasks = Tasks(notebook, self)
 
         save.load(self.subjects, self.tasks)
 
     def run(self):
         self.window.mainloop()
+
+    def save(self):
+        save.save(self.subjects, self.tasks)
 
 
 if __name__ == '__main__':

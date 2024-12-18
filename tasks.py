@@ -7,7 +7,6 @@ import tkcalendar
 
 import plan
 import tab
-import save
 
 
 def make_gray_style(base):
@@ -16,10 +15,11 @@ def make_gray_style(base):
 
 
 class Tasks(tab.Tab):
-    def __init__(self, notebook):
+    def __init__(self, notebook, app):
         super().__init__(Tasks.EntryRow)
 
-        self.subjects = None
+        self.app = app
+
         tasks = ttk.Frame(notebook)
         tasks.pack()
 
@@ -39,7 +39,7 @@ class Tasks(tab.Tab):
         clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
-        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: save.save(self.subjects, self))
+        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: self.app.save())
         save_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(tasks, text="Домашки")
@@ -157,7 +157,7 @@ class Tasks(tab.Tab):
             self.subtask_frame = ttk.Frame(tasks.task_entries)
 
         def update_combobox(self):
-            self.subject['values'] = self.tab.subjects.subject_names()
+            self.subject['values'] = self.tab.app.subjects.subject_names()
 
         def gray_out(self):
             for widget in self.widgets:
@@ -186,7 +186,7 @@ class Tasks(tab.Tab):
                     widget['style'] = 'TButton'
 
         def marked_done(self):
-            self.tab.subjects.add_score(self.subject.get(), self.score.get())
+            self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
             self.gray_out()
 
             for subtask in self.subtasks:
@@ -194,7 +194,7 @@ class Tasks(tab.Tab):
                 subtask.gray_out()
 
         def marked_not_done(self):
-            self.tab.subjects.add_score(self.subject.get(), -self.score.get())
+            self.tab.app.subjects.add_score(self.subject.get(), -self.score.get())
             self.ungray_out()
 
             for subtask in self.subtasks:
@@ -205,22 +205,22 @@ class Tasks(tab.Tab):
             done = all(subtask.done.get() for subtask in self.subtasks)
             if done and not self.done.get():
                 self.done.set(True)
-                self.tab.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
                 self.gray_out()
             elif not done and self.done.get():
                 self.done.set(False)
-                self.tab.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
                 self.ungray_out()
 
         def score_updated(self):
             if self.done.get():
-                self.tab.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
+                self.tab.app.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
             self.old_score = self.score.get()
 
         def subject_updated(self):
             if self.done.get():
-                self.tab.subjects.add_score(self.old_subject, -self.score.get())
-                self.tab.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.app.subjects.add_score(self.old_subject, -self.score.get())
+                self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
             self.old_subject = self.subject.get()
 
         def grid(self, row):
@@ -251,7 +251,7 @@ class Tasks(tab.Tab):
         self.forget_all()
 
         order = plan.plan(int(datetime.datetime.now().timestamp() / 3600),
-                          self.subjects.target_scores(), self.tasks())
+                          self.app.subjects.target_scores(), self.tasks())
 
         for row in self.entry_rows:
             row.gray_out()
