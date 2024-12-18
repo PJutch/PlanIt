@@ -243,7 +243,11 @@ class Tasks(tab.Tab):
             'subject': row.subject.get(),
             'score': row.score.get(),
             'time': row.time.get(),
-            'deadline': row.deadline.get_date().isoformat()
+            'deadline': row.deadline.get_date().isoformat(),
+            'subtasks': [{
+                'name': subtask.name.get(),
+                'time': subtask.time.get()
+            } for subtask in row.subtasks]
         } for row in self.entry_rows]
 
     def load_data(self, data):
@@ -255,3 +259,7 @@ class Tasks(tab.Tab):
             self.entry_rows[-1].score.set(row['score'])
             self.entry_rows[-1].time.set(row['time'])
             self.entry_rows[-1].deadline.set_date(datetime.datetime.fromisoformat(row['deadline']))
+            for subtask in row['subtasks']:
+                self.entry_rows[-1].add_subtask()
+                self.entry_rows[-1].subtasks[-1].name.set(subtask['name'])
+                self.entry_rows[-1].subtasks[-1].time.set(subtask['time'])

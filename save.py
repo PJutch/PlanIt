@@ -20,3 +20,5 @@ def load(subjects, tasks):
         pass
     except ValueError:
         pass
+    except TypeError:
+        pass
