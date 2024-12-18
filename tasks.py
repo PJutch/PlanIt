@@ -74,7 +74,7 @@ class Tasks(tab.Tab):
                                 ttk.Label(row.subtask_frame, text='Часы бота:'),
                                 ttk.Entry(row.subtask_frame, textvariable=self.time),
                                 ttk.Button(row.subtask_frame, text="Удалить",
-                                           command=lambda: row.remove_row(self.id))]
+                                           command=lambda: row.remove_subtask(self.id))]
 
             def gray_out(self):
                 for widget in self.widgets:
@@ -209,6 +209,13 @@ class Tasks(tab.Tab):
             for subtask in self.subtasks:
                 subtask.forget()
             self.subtasks.append(self.Subtask(self))
+            for i in range(len(self.subtasks)):
+                self.subtasks[i].grid(i)
+
+        def remove_subtask(self, deleted):
+            for subtask in self.subtasks:
+                subtask.forget()
+            self.subtasks = [subtask for subtask in self.subtasks if subtask.id != deleted]
             for i in range(len(self.subtasks)):
                 self.subtasks[i].grid(i)
 
