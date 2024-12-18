@@ -201,3 +201,13 @@ class Tasks:
             'time': row.time.get(),
             'date': row.deadline.get_date()
         } for row in self.entry_rows]
+
+    def load_data(self, data):
+        for row in data:
+            self.add_row()
+            self.entry_rows[-1].done.set(row['done'])
+            self.entry_rows[-1].name.set(row['name'])
+            self.entry_rows[-1].subject.set(row['subject'])
+            self.entry_rows[-1].score.set(row['score'])
+            self.entry_rows[-1].time.set(row['time'])
+            self.entry_rows[-1].deadline.set(row['date'])
