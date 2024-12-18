@@ -22,3 +22,5 @@ def load(subjects, tasks):
         pass
     except TypeError:
         pass
+    except KeyError:
+        pass

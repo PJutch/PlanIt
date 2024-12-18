@@ -63,7 +63,6 @@ class Tasks(tab.Tab):
                 self.done.set(False)
 
                 self.name = tkinter.StringVar()
-                self.time = tkinter.IntVar()
 
                 self.widgets = [ttk.Checkbutton(row.subtask_frame, variable=self.done,
                                                 command=lambda:
@@ -278,20 +277,28 @@ class Tasks(tab.Tab):
             'deadline': row.deadline.get_date().isoformat(),
             'subtasks': [{
                 'name': subtask.name.get(),
-                'time': subtask.time.get()
+                'done': subtask.done.get()
             } for subtask in row.subtasks]
         } for row in self.entry_rows]
 
     def load_data(self, data):
         for row in data:
             self.add_row()
-            self.entry_rows[-1].done.set(row['done'])
+
+            for subtask in row['subtasks']:
+                self.entry_rows[-1].add_subtask()
+                self.entry_rows[-1].subtasks[-1].name.set(subtask['name'])
+
+                if subtask['done']:
+                    self.entry_rows[-1].subtasks[-1].done.set(True)
+                    self.entry_rows[-1].subtasks[-1].gray_out()
+
+            if row['done']:
+                self.entry_rows[-1].done.set(True)
+                self.entry_rows[-1].gray_out()
+
             self.entry_rows[-1].name.set(row['name'])
             self.entry_rows[-1].subject.set(row['subject'])
             self.entry_rows[-1].score.set(row['score'])
             self.entry_rows[-1].time.set(row['time'])
             self.entry_rows[-1].deadline.set_date(datetime.datetime.fromisoformat(row['deadline']))
-            for subtask in row['subtasks']:
-                self.entry_rows[-1].add_subtask()
-                self.entry_rows[-1].subtasks[-1].name.set(subtask['name'])
-                self.entry_rows[-1].subtasks[-1].time.set(subtask['time'])
