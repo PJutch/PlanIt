@@ -6,6 +6,7 @@ from tkinter import ttk
 import tkcalendar
 
 import plan
+import save
 
 
 def make_gray_style(base):
@@ -37,6 +38,9 @@ class Tasks:
 
         clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
+
+        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: save.save(self.subjects, self))
+        save_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(tasks, text="Домашки")
 
@@ -187,3 +191,13 @@ class Tasks:
         return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
                           (row.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
                 for row in self.entry_rows]
+
+    def saved_data(self):
+        return [{
+            'done': row.done.get(),
+            'name': row.name.get(),
+            'subject': row.subject.get(),
+            'score': row.score.get(),
+            'time': row.time.get(),
+            'date': row.deadline.get_date()
+        } for row in self.entry_rows]

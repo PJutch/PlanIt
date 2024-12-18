@@ -1,6 +1,8 @@
 import tkinter
 from tkinter import ttk
 
+import save
+
 
 class Subjects:
     def __init__(self, notebook):
@@ -24,6 +26,9 @@ class Subjects:
 
         clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
+
+        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: save.save(self, self.tasks))
+        save_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(subjects, text="Предметы")
 

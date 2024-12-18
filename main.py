@@ -1,9 +1,8 @@
-import plan
-from subjects import Subjects
-from tasks import Tasks
-
 import tkinter
 from tkinter import ttk
+
+from subjects import Subjects
+from tasks import Tasks
 
 if __name__ == '__main__':
     window = tkinter.Tk()
