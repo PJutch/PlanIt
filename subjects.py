@@ -2,15 +2,11 @@ import tkinter
 from tkinter import ttk
 
 import tab
-import save
-
 
 
 class Subjects(tab.Tab):
-    def __init__(self, notebook):
-        super().__init__(Subjects.EntryRow)
-
-        self.tasks = None
+    def __init__(self, notebook, app):
+        super().__init__(Subjects.EntryRow, app)
 
         subjects = ttk.Frame(notebook)
         subjects.pack()
@@ -28,7 +24,7 @@ class Subjects(tab.Tab):
         clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
-        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: save.save(self, self.tasks))
+        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: self.app.save())
         save_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(subjects, text="Предметы")
@@ -38,8 +34,11 @@ class Subjects(tab.Tab):
             super().__init__(subjects)
 
             self.name = tkinter.StringVar()
-            self.name.trace_add('write', lambda name, index, mode, sv=self.name: subjects.tasks.subject_renamed())
+            self.name.trace_add('write', lambda name, index, mode: subjects.subject_renamed())
+
             self.score = tkinter.IntVar()
+            self.score.trace_add('write', lambda name, index, mode: subjects.app.mark_changed())
+
             self.achieved_score = 0
             self.score_label = ttk.Label(subjects.entries, text=self.score_text())
             self.widgets = [ttk.Label(subjects.entries, text='Название:'),
@@ -51,11 +50,21 @@ class Subjects(tab.Tab):
         def score_text(self):
             return f'Балл {self.achieved_score} /'
 
+        def get_target_score(self):
+            try:
+                return self.score.get()
+            except tkinter.TclError:
+                return 0
+
     def subject_names(self):
         return [row.name.get() for row in self.entry_rows if row.name.get() and not row.name.get().isspace()]
 
     def target_scores(self):
-        return {subject.name.get(): subject.score.get() for subject in self.entry_rows}
+        return {subject.name.get(): subject.get_target_score() for subject in self.entry_rows}
+
+    def saved_data(self):
+        return [{'name': subject.name.get(), 'target_score': subject.get_target_score()}
+                for subject in self.entry_rows]
 
     def add_score(self, subject, score):
         for row in self.entry_rows:
@@ -64,7 +73,11 @@ class Subjects(tab.Tab):
                 row.score_label['text'] = row.score_text()
 
     def load_data(self, data):
-        for name, target_score in data.items():
+        for row in data:
             self.add_row()
-            self.entry_rows[-1].name.set(name)
-            self.entry_rows[-1].score.set(target_score)
+            self.entry_rows[-1].name.set(row['name'])
+            self.entry_rows[-1].score.set(row['target_score'])
+
+    def subject_renamed(self):
+        self.app.mark_changed()
+        self.app.tasks.subject_renamed()

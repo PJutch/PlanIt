@@ -2,9 +2,11 @@ import tkinter
 
 
 class Tab:
-    def __init__(self, row_type):
+    def __init__(self, row_type, app):
         self.entry_rows: list[row_type] = []
         self.next_row_id = 0
+
+        self.app = app
 
     class EntryRow:
         def __init__(self, tab):
@@ -36,10 +38,14 @@ class Tab:
         self.entry_rows = [row for row in self.entry_rows if row.id != deleted]
         self.grid_all()
 
+        self.app.mark_changed()
+
     def add_row(self):
         self.forget_all()
         self.entry_rows.append(self.EntryRow(self))
         self.grid_all()
+
+        self.app.mark_changed()
 
     def clear(self):
         self.forget_all()
