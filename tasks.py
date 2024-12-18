@@ -71,8 +71,6 @@ class Tasks(tab.Tab):
                                                 else self.ungray_out()),
                                 ttk.Label(row.subtask_frame, text='Название:'),
                                 ttk.Entry(row.subtask_frame),
-                                ttk.Label(row.subtask_frame, text='Часы бота:'),
-                                ttk.Entry(row.subtask_frame, textvariable=self.time),
                                 ttk.Button(row.subtask_frame, text="Удалить",
                                            command=lambda: row.remove_subtask(self.id))]
 
