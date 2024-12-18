@@ -1,5 +1,6 @@
 import tkinter
 from tkinter import ttk
+from tkinter import messagebox
 
 import save
 from subjects import Subjects
@@ -21,6 +22,8 @@ class App:
         self.window.title('PlanIt')
         self.changed = False
 
+        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
+
     def run(self):
         self.window.mainloop()
 
@@ -32,6 +35,16 @@ class App:
     def mark_changed(self):
         self.changed = True
         self.window.title('*PlanIt')
+
+    def on_closing(self):
+        if self.changed:
+            save = messagebox.askyesnocancel(title='Сохранить?', message='Сохранить внесённые изменения?')
+            if save:
+                self.save()
+            if save is not None:
+                self.window.destroy()
+        else:
+            self.window.destroy()
 
 
 if __name__ == '__main__':
