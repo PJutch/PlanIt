@@ -34,7 +34,7 @@ class Subjects(tab.Tab):
             super().__init__(subjects)
 
             self.name = tkinter.StringVar()
-            self.name.trace_add('write', lambda name, index, mode: subjects.app.tasks.subject_renamed())
+            self.name.trace_add('write', lambda name, index, mode: subjects.subject_renamed())
 
             self.score = tkinter.IntVar()
             self.score.trace_add('write', lambda name, index, mode: subjects.app.mark_changed())
@@ -67,3 +67,7 @@ class Subjects(tab.Tab):
             self.add_row()
             self.entry_rows[-1].name.set(name)
             self.entry_rows[-1].score.set(target_score)
+
+    def subject_renamed(self):
+        self.app.mark_changed()
+        self.app.tasks.subject_renamed()
