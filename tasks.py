@@ -7,6 +7,7 @@ import tkcalendar
 
 import plan
 import tab
+import save
 
 
 def make_gray_style(base):
@@ -37,6 +38,9 @@ class Tasks(tab.Tab):
 
         clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
+
+        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: save.save(self.subjects, self))
+        save_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(tasks, text="Домашки")
 
@@ -154,3 +158,23 @@ class Tasks(tab.Tab):
         return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
                           (row.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
                 for row in self.entry_rows]
+
+    def saved_data(self):
+        return [{
+            'done': row.done.get(),
+            'name': row.name.get(),
+            'subject': row.subject.get(),
+            'score': row.score.get(),
+            'time': row.time.get(),
+            'deadline': row.deadline.get_date().isoformat()
+        } for row in self.entry_rows]
+
+    def load_data(self, data):
+        for row in data:
+            self.add_row()
+            self.entry_rows[-1].done.set(row['done'])
+            self.entry_rows[-1].name.set(row['name'])
+            self.entry_rows[-1].subject.set(row['subject'])
+            self.entry_rows[-1].score.set(row['score'])
+            self.entry_rows[-1].time.set(row['time'])
+            self.entry_rows[-1].deadline.set_date(datetime.datetime.fromisoformat(row['deadline']))

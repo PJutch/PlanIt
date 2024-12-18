@@ -2,12 +2,14 @@ import tkinter
 from tkinter import ttk
 
 import tab
+import save
+
 
 
 class Subjects(tab.Tab):
     def __init__(self, notebook):
         super().__init__(Subjects.EntryRow)
-        
+
         self.tasks = None
 
         subjects = ttk.Frame(notebook)
@@ -25,6 +27,9 @@ class Subjects(tab.Tab):
 
         clear_button = ttk.Button(buttons, text="Очистить", command=self.clear)
         clear_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
+
+        save_button = ttk.Button(buttons, text="Сохранить", command=lambda: save.save(self, self.tasks))
+        save_button.pack(anchor=tkinter.N, padx=6, pady=6, side='left')
 
         notebook.add(subjects, text="Предметы")
 
@@ -57,3 +62,9 @@ class Subjects(tab.Tab):
             if row.name.get() == subject:
                 row.achieved_score += score
                 row.score_label['text'] = row.score_text()
+
+    def load_data(self, data):
+        for name, target_score in data.items():
+            self.add_row()
+            self.entry_rows[-1].name.set(name)
+            self.entry_rows[-1].score.set(target_score)

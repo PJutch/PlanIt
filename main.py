@@ -1,9 +1,9 @@
-import plan
-from subjects import Subjects
-from tasks import Tasks
-
 import tkinter
 from tkinter import ttk
+
+import save
+from subjects import Subjects
+from tasks import Tasks
 
 if __name__ == '__main__':
     window = tkinter.Tk()
@@ -17,5 +17,7 @@ if __name__ == '__main__':
 
     subjects.tasks = tasks
     tasks.subjects = subjects
+
+    save.load(subjects, tasks)
 
     window.mainloop()
