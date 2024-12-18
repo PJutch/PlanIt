@@ -185,7 +185,7 @@ class Tasks(tab.Tab):
                 set_normal_style(widget)
 
         def marked_done(self):
-            self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
+            self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
             self.gray_out()
 
             for subtask in self.subtasks:
@@ -193,7 +193,7 @@ class Tasks(tab.Tab):
                 subtask.gray_out()
 
         def marked_not_done(self):
-            self.tab.app.subjects.add_score(self.subject.get(), -self.score.get())
+            self.tab.app.subjects.add_score(self.subject.get(), -self.get_score())
             self.ungray_out()
 
             for subtask in self.subtasks:
@@ -204,24 +204,27 @@ class Tasks(tab.Tab):
             done = all(subtask.done.get() for subtask in self.subtasks)
             if done and not self.done.get():
                 self.done.set(True)
-                self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
                 self.gray_out()
             elif not done and self.done.get():
                 self.done.set(False)
-                self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.app.subjects.add_score(self.subject.get(), -self.get_score())
                 self.ungray_out()
 
         def score_updated(self):
-            if self.done.get():
-                self.tab.app.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
-            self.old_score = self.score.get()
+            try:
+                if self.done.get():
+                    self.tab.app.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
+                self.old_score = self.score.get()
 
-            self.tab.app.mark_changed()
+                self.tab.app.mark_changed()
+            except tkinter.TclError:
+                pass
 
         def subject_updated(self):
             if self.done.get():
-                self.tab.app.subjects.add_score(self.old_subject, -self.score.get())
-                self.tab.app.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.app.subjects.add_score(self.old_subject, -self.get_score())
+                self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
             self.old_subject = self.subject.get()
 
             self.tab.app.mark_changed()
@@ -250,6 +253,18 @@ class Tasks(tab.Tab):
 
             self.tab.app.mark_changed()
 
+        def get_score(self):
+            try:
+                return self.score.get()
+            except tkinter.TclError:
+                return 0
+
+        def get_time(self):
+            try:
+                return self.time.get()
+            except tkinter.TclError:
+                return 0
+
     def subject_renamed(self):
         for row in self.entry_rows:
             row.update_combobox()
@@ -272,7 +287,7 @@ class Tasks(tab.Tab):
         self.app.mark_changed()
 
     def tasks(self):
-        return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
+        return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.get_score(), row.get_time() * 3,
                           (row.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
                 for row in self.entry_rows]
 
@@ -281,8 +296,8 @@ class Tasks(tab.Tab):
             'done': row.done.get(),
             'name': row.name.get(),
             'subject': row.subject.get(),
-            'score': row.score.get(),
-            'time': row.time.get(),
+            'score': row.get_score(),
+            'time': row.get_time(),
             'deadline': row.deadline.get_date().isoformat(),
             'subtasks': [{
                 'name': subtask.name.get(),

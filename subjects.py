@@ -50,11 +50,17 @@ class Subjects(tab.Tab):
         def score_text(self):
             return f'Балл {self.achieved_score} /'
 
+        def get_target_score(self):
+            try:
+                return self.score.get()
+            except tkinter.TclError:
+                return 0
+
     def subject_names(self):
         return [row.name.get() for row in self.entry_rows if row.name.get() and not row.name.get().isspace()]
 
     def target_scores(self):
-        return {subject.name.get(): subject.score.get() for subject in self.entry_rows}
+        return {subject.name.get(): subject.get_target_score() for subject in self.entry_rows}
 
     def add_score(self, subject, score):
         for row in self.entry_rows:
