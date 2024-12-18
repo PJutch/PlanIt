@@ -229,6 +229,11 @@ class Tasks(tab.Tab):
 
             self.tab.app.mark_changed()
 
+        def forget(self):
+            for widget in self.widgets:
+                widget.grid_forget()
+            self.subtask_frame.grid_forget()
+
         def grid(self, row):
             for j in range(len(self.widgets)):
                 self.widgets[j].grid(row=2 * row, column=j, sticky=tkinter.W + tkinter.E)
