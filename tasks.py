@@ -59,8 +59,10 @@ class Tasks(tab.Tab):
 
                 self.done = tkinter.BooleanVar()
                 self.done.set(False)
+                self.done.trace_add('write', lambda name, index, mode: row.tab.app.mark_changed())
 
                 self.name = tkinter.StringVar()
+                self.name.trace_add('write', lambda name, index, mode: row.tab.app.mark_changed())
 
                 self.widgets = [ttk.Checkbutton(row.subtask_frame, variable=self.done,
                                                 command=lambda:
@@ -123,10 +125,19 @@ class Tasks(tab.Tab):
 
             self.done = tkinter.BooleanVar()
             self.done.set(False)
+            self.done.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
 
             self.name = tkinter.StringVar()
+            self.name.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
+
             self.time = tkinter.IntVar()
-            self.deadline = tkcalendar.DateEntry(tasks.task_entries, locale=locale.getdefaultlocale()[0])
+            self.time.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
+
+            self.deadline_variable = tkinter.StringVar()
+            self.deadline_variable.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
+
+            self.deadline = tkcalendar.DateEntry(tasks.task_entries, locale=locale.getdefaultlocale()[0],
+                                                 textvariable=self.deadline_variable)
 
             self.score = tkinter.IntVar()
             self.score.trace_add('write', lambda name, index, mode: self.score_updated())
@@ -234,12 +245,16 @@ class Tasks(tab.Tab):
             for i in range(len(self.subtasks)):
                 self.subtasks[i].grid(i)
 
+            self.tab.app.mark_changed()
+
         def remove_subtask(self, deleted):
             for subtask in self.subtasks:
                 subtask.forget()
             self.subtasks = [subtask for subtask in self.subtasks if subtask.id != deleted]
             for i in range(len(self.subtasks)):
                 self.subtasks[i].grid(i)
+
+            self.tab.app.mark_changed()
 
     def subject_renamed(self):
         for row in self.entry_rows:
@@ -259,6 +274,8 @@ class Tasks(tab.Tab):
                            + [entry_row for i, entry_row in enumerate(self.entry_rows) if i not in order])
 
         self.grid_all()
+
+        self.app.mark_changed()
 
     def tasks(self):
         return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,

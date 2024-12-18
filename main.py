@@ -19,11 +19,17 @@ class App:
 
         save.load(self.subjects, self.tasks)
 
+        self.changed = False
+
     def run(self):
         self.window.mainloop()
 
     def save(self):
         save.save(self.subjects, self.tasks)
+        self.changed = False
+
+    def mark_changed(self):
+        self.changed = True
 
 
 if __name__ == '__main__':

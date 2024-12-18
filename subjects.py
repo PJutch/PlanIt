@@ -35,7 +35,10 @@ class Subjects(tab.Tab):
 
             self.name = tkinter.StringVar()
             self.name.trace_add('write', lambda name, index, mode: subjects.app.tasks.subject_renamed())
+
             self.score = tkinter.IntVar()
+            self.score.trace_add('write', lambda name, index, mode: subjects.app.mark_changed())
+
             self.achieved_score = 0
             self.score_label = ttk.Label(subjects.entries, text=self.score_text())
             self.widgets = [ttk.Label(subjects.entries, text='Название:'),
