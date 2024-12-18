@@ -1,13 +1,14 @@
 import tkinter
 from tkinter import ttk
 
+import tab
 
-class Subjects:
+
+class Subjects(tab.Tab):
     def __init__(self, notebook):
+        super().__init__(Subjects.EntryRow)
+        
         self.tasks = None
-
-        self.entry_rows: list[Subjects.EntryRow] = []
-        self.next_row_id = 0
 
         subjects = ttk.Frame(notebook)
         subjects.pack()
@@ -27,10 +28,9 @@ class Subjects:
 
         notebook.add(subjects, text="Предметы")
 
-    class EntryRow:
+    class EntryRow(tab.Tab.EntryRow):
         def __init__(self, subjects):
-            self.id = subjects.next_row_id
-            subjects.next_row_id += 1
+            super().__init__(subjects)
 
             self.name = tkinter.StringVar()
             self.name.trace_add('write', lambda name, index, mode, sv=self.name: subjects.tasks.subject_renamed())
@@ -46,39 +46,8 @@ class Subjects:
         def score_text(self):
             return f'Балл {self.achieved_score} /'
 
-        def forget(self):
-            for widget in self.widgets:
-                widget.grid_forget()
-
-        def grid(self, row):
-            for j in range(len(self.widgets)):
-                self.widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
-
-    def forget_all(self):
-        for row in self.entry_rows:
-            row.forget()
-
-    def grid_all(self):
-        for i in range(len(self.entry_rows)):
-            self.entry_rows[i].grid(i)
-
-    def remove_row(self, deleted):
-        self.forget_all()
-        self.entry_rows = [row for row in self.entry_rows if row.id != deleted]
-        self.grid_all()
-        self.tasks.subject_renamed()
-
-    def add_row(self):
-        self.forget_all()
-        self.entry_rows.append(self.EntryRow(self))
-        self.grid_all()
-
     def subject_names(self):
         return [row.name.get() for row in self.entry_rows if row.name.get() and not row.name.get().isspace()]
-
-    def clear(self):
-        self.forget_all()
-        self.entry_rows = []
 
     def target_scores(self):
         return {subject.name.get(): subject.score.get() for subject in self.entry_rows}

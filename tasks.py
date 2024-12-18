@@ -6,6 +6,7 @@ from tkinter import ttk
 import tkcalendar
 
 import plan
+import tab
 
 
 def make_gray_style(base):
@@ -13,17 +14,16 @@ def make_gray_style(base):
     style.configure(f'Gray.{base}', foreground='gray')
 
 
-class Tasks:
+class Tasks(tab.Tab):
     def __init__(self, notebook):
-        self.subjects = None
-        self.entry_rows: list[Tasks.EntryRow] = []
-        self.next_row_id = 0
+        super().__init__(Tasks.EntryRow)
 
+        self.subjects = None
         tasks = ttk.Frame(notebook)
         tasks.pack()
 
         self.task_entries = ttk.Frame(tasks)
-        self.task_entries.columnconfigure(1, weight=1)
+        self.task_entries.columnconfigure(2, weight=1)
         self.task_entries.pack(fill=tkinter.X)
 
         buttons = ttk.Frame(tasks)
@@ -46,12 +46,9 @@ class Tasks:
         make_gray_style('TCombobox')
         make_gray_style('TButton')
 
-    class EntryRow:
+    class EntryRow(tab.Tab.EntryRow):
         def __init__(self, tasks):
-            self.tasks = tasks
-
-            self.id = tasks.next_row_id
-            tasks.next_row_id += 1
+            super().__init__(tasks)
 
             self.subject_var = tkinter.StringVar()
             self.subject = ttk.Combobox(tasks.task_entries, textvariable=self.subject_var)
@@ -86,16 +83,8 @@ class Tasks:
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
             self.update_combobox()
 
-        def forget(self):
-            for widget in self.widgets:
-                widget.grid_forget()
-
-        def grid(self, row):
-            for j in range(len(self.widgets)):
-                self.widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
-
         def update_combobox(self):
-            self.subject['values'] = self.tasks.subjects.subject_names()
+            self.subject['values'] = self.tab.subjects.subject_names()
 
         def gray_out(self):
             for widget in self.widgets:
@@ -124,41 +113,23 @@ class Tasks:
                     widget['style'] = 'TButton'
 
         def marked_done(self):
-            self.tasks.subjects.add_score(self.subject.get(), self.score.get())
+            self.tab.subjects.add_score(self.subject.get(), self.score.get())
             self.gray_out()
 
         def marked_not_done(self):
-            self.tasks.subjects.add_score(self.subject.get(), -self.score.get())
+            self.tab.subjects.add_score(self.subject.get(), -self.score.get())
             self.ungray_out()
 
         def score_updated(self):
             if self.done.get():
-                self.tasks.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
+                self.tab.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
             self.old_score = self.score.get()
 
         def subject_updated(self):
             if self.done.get():
-                self.tasks.subjects.add_score(self.old_subject, -self.score.get())
-                self.tasks.subjects.add_score(self.subject.get(), self.score.get())
+                self.tab.subjects.add_score(self.old_subject, -self.score.get())
+                self.tab.subjects.add_score(self.subject.get(), self.score.get())
             self.old_subject = self.subject.get()
-
-    def forget_all(self):
-        for row in self.entry_rows:
-            row.forget()
-
-    def grid_all(self):
-        for i in range(len(self.entry_rows)):
-            self.entry_rows[i].grid(i)
-
-    def remove_row(self, deleted):
-        self.forget_all()
-        self.entry_rows = [row for row in self.entry_rows if row.id != deleted]
-        self.grid_all()
-
-    def add_row(self):
-        self.forget_all()
-        self.entry_rows.append(self.EntryRow(self))
-        self.grid_all()
 
     def subject_renamed(self):
         for row in self.entry_rows:
@@ -178,10 +149,6 @@ class Tasks:
                            + [entry_row for i, entry_row in enumerate(self.entry_rows) if i not in order])
 
         self.grid_all()
-
-    def clear(self):
-        self.forget_all()
-        self.entry_rows = []
 
     def tasks(self):
         return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.score.get(), row.time.get() * 3,
