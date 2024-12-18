@@ -6,7 +6,7 @@ class Subjects:
     def __init__(self, notebook):
         self.tasks = None
 
-        self.entry_rows = []
+        self.entry_rows: list[Subjects.EntryRow] = []
         self.next_row_id = 0
 
         subjects = ttk.Frame(notebook)
@@ -35,11 +35,16 @@ class Subjects:
             self.name = tkinter.StringVar()
             self.name.trace_add('write', lambda name, index, mode, sv=self.name: subjects.tasks.subject_renamed())
             self.score = tkinter.IntVar()
+            self.achieved_score = 0
+            self.score_label = ttk.Label(subjects.entries, text=self.score_text())
             self.widgets = [ttk.Label(subjects.entries, text='Название:'),
                             ttk.Entry(subjects.entries, textvariable=self.name),
-                            ttk.Label(subjects.entries, text='Целевой балл:'),
+                            self.score_label,
                             ttk.Entry(subjects.entries, textvariable=self.score),
                             ttk.Button(subjects.entries, text="Удалить", command=lambda: subjects.remove_row(self.id))]
+
+        def score_text(self):
+            return f'Балл {self.achieved_score} /'
 
         def forget(self):
             for widget in self.widgets:
@@ -77,3 +82,9 @@ class Subjects:
 
     def target_scores(self):
         return {subject.name.get(): subject.score.get() for subject in self.entry_rows}
+
+    def add_score(self, subject, score):
+        for row in self.entry_rows:
+            if row.name.get() == subject:
+                row.achieved_score += score
+                row.score_label['text'] = row.score_text()

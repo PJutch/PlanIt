@@ -52,18 +52,26 @@ class Tasks:
             self.id = tasks.next_row_id
             tasks.next_row_id += 1
 
-            self.subject = ttk.Combobox(tasks.task_entries)
+            self.subject_var = tkinter.StringVar()
+            self.subject = ttk.Combobox(tasks.task_entries, textvariable=self.subject_var)
+            self.subject_var.trace_add('write', lambda name, index, mode: self.subject_updated())
+            self.old_subject = ''
 
             self.done = tkinter.BooleanVar()
             self.done.set(False)
 
             self.name = tkinter.StringVar()
-            self.score = tkinter.IntVar()
             self.time = tkinter.IntVar()
             self.deadline = tkcalendar.DateEntry(tasks.task_entries)
 
+            self.score = tkinter.IntVar()
+            self.score.trace_add('write', lambda name, index, mode: self.score_updated())
+            self.old_score = 0
+
             self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done,
-                                            command=lambda: self.gray_out() if self.done.get() else self.ungray_out()),
+                                            command=lambda:
+                                                self.marked_done() if self.done.get()
+                                                else self.marked_not_done()),
                             ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
@@ -113,6 +121,25 @@ class Tasks:
                     widget['style'] = 'TCombobox'
                 elif isinstance(widget, ttk.Button):
                     widget['style'] = 'TButton'
+
+        def marked_done(self):
+            self.tasks.subjects.add_score(self.subject.get(), self.score.get())
+            self.gray_out()
+
+        def marked_not_done(self):
+            self.tasks.subjects.add_score(self.subject.get(), -self.score.get())
+            self.ungray_out()
+
+        def score_updated(self):
+            if self.done.get():
+                self.tasks.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
+            self.old_score = self.score.get()
+
+        def subject_updated(self):
+            if self.done.get():
+                self.tasks.subjects.add_score(self.old_subject, -self.score.get())
+                self.tasks.subjects.add_score(self.subject.get(), self.score.get())
+            self.old_subject = self.subject.get()
 
     def forget_all(self):
         for row in self.entry_rows:
