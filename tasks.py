@@ -51,6 +51,65 @@ class Tasks(tab.Tab):
         make_gray_style('TButton')
 
     class EntryRow(tab.Tab.EntryRow):
+        class Subtask:
+
+            def __init__(self, row):
+                self.row = row
+
+                self.id = row.next_subtask_id
+                row.next_subtask_id += 1
+
+                self.done = tkinter.BooleanVar()
+                self.done.set(False)
+
+                self.name = tkinter.StringVar()
+                self.time = tkinter.IntVar()
+
+                self.widgets = [ttk.Checkbutton(row.subtask_frame, variable=self.done,
+                                                command=lambda:
+                                                self.gray_out() if self.done.get()
+                                                else self.ungray_out()),
+                                ttk.Label(row.subtask_frame, text='Название:'),
+                                ttk.Entry(row.subtask_frame),
+                                ttk.Label(row.subtask_frame, text='Часы бота:'),
+                                ttk.Entry(row.subtask_frame, textvariable=self.time),
+                                ttk.Button(row.subtask_frame, text="Удалить",
+                                           command=lambda: row.remove_row(self.id))]
+
+            def gray_out(self):
+                for widget in self.widgets:
+                    if isinstance(widget, ttk.Checkbutton):
+                        widget['style'] = 'Gray.TCheckbutton'
+                    elif isinstance(widget, ttk.Label):
+                        widget['style'] = 'Gray.TLabel'
+                    elif isinstance(widget, ttk.Entry):
+                        widget['style'] = 'Gray.TEntry'
+                    elif isinstance(widget, ttk.Combobox):
+                        widget['style'] = 'Gray.TCombobox'
+                    elif isinstance(widget, ttk.Button):
+                        widget['style'] = 'Gray.TButton'
+
+            def ungray_out(self):
+                for widget in self.widgets:
+                    if isinstance(widget, ttk.Checkbutton):
+                        widget['style'] = 'TCheckbutton'
+                    elif isinstance(widget, ttk.Label):
+                        widget['style'] = 'TLabel'
+                    elif isinstance(widget, ttk.Entry):
+                        widget['style'] = 'TEntry'
+                    elif isinstance(widget, ttk.Combobox):
+                        widget['style'] = 'TCombobox'
+                    elif isinstance(widget, ttk.Button):
+                        widget['style'] = 'TButton'
+
+            def forget(self):
+                for widget in self.widgets:
+                    widget.grid_forget()
+
+            def grid(self, row):
+                for j in range(len(self.widgets)):
+                    self.widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
+
         def __init__(self, tasks):
             super().__init__(tasks)
 
@@ -72,8 +131,8 @@ class Tasks(tab.Tab):
 
             self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done,
                                             command=lambda:
-                                                self.marked_done() if self.done.get()
-                                                else self.marked_not_done()),
+                                            self.marked_done() if self.done.get()
+                                            else self.marked_not_done()),
                             ttk.Label(tasks.task_entries, text='Название:'),
                             ttk.Entry(tasks.task_entries),
                             ttk.Label(tasks.task_entries, text='Предмет:'),
@@ -84,8 +143,13 @@ class Tasks(tab.Tab):
                             ttk.Entry(tasks.task_entries, textvariable=self.time),
                             ttk.Label(tasks.task_entries, text='Дедлайн:'),
                             self.deadline,
+                            ttk.Button(tasks.task_entries, text="Добавить", command=self.add_subtask),
                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
             self.update_combobox()
+
+            self.subtasks = []
+            self.next_subtask_id = 0
+            self.subtask_frame = ttk.Frame(tasks.task_entries)
 
         def update_combobox(self):
             self.subject['values'] = self.tab.subjects.subject_names()
@@ -134,6 +198,19 @@ class Tasks(tab.Tab):
                 self.tab.subjects.add_score(self.old_subject, -self.score.get())
                 self.tab.subjects.add_score(self.subject.get(), self.score.get())
             self.old_subject = self.subject.get()
+
+        def grid(self, row):
+            for j in range(len(self.widgets)):
+                self.widgets[j].grid(row=2 * row, column=j, sticky=tkinter.W + tkinter.E)
+            self.subtask_frame.grid(row=2 * row + 1, column=1, columnspan=len(self.widgets),
+                                    sticky=tkinter.W + tkinter.E)
+
+        def add_subtask(self):
+            for subtask in self.subtasks:
+                subtask.forget()
+            self.subtasks.append(self.Subtask(self))
+            for i in range(len(self.subtasks)):
+                self.subtasks[i].grid(i)
 
     def subject_renamed(self):
         for row in self.entry_rows:
