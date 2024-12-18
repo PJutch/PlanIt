@@ -9,7 +9,6 @@ from tasks import Tasks
 class App:
     def __init__(self):
         self.window = tkinter.Tk()
-        self.window.title('PlanIt')
 
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=tkinter.BOTH)
@@ -19,6 +18,7 @@ class App:
 
         save.load(self.subjects, self.tasks)
 
+        self.window.title('PlanIt')
         self.changed = False
 
     def run(self):
@@ -27,9 +27,11 @@ class App:
     def save(self):
         save.save(self.subjects, self.tasks)
         self.changed = False
+        self.window.title('PlanIt')
 
     def mark_changed(self):
         self.changed = True
+        self.window.title('*PlanIt')
 
 
 if __name__ == '__main__':
