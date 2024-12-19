@@ -137,6 +137,8 @@ class Tasks(tab.Tab):
         def __init__(self, tasks):
             super().__init__(tasks)
 
+            self.needed = True
+
             self.__subject_var = tkinter.StringVar()
             self.subject = ttk.Combobox(tasks.task_entries, textvariable=self.__subject_var)
             self.__subject_var.trace_add('write', lambda name, index, mode: self.subject_updated())
@@ -196,20 +198,22 @@ class Tasks(tab.Tab):
             for widget in self._widgets:
                 set_gray_style(widget)
 
-        def gray_out_all(self):
+        def mark_redundant(self):
             self.gray_out()
             for subtask in self.subtasks:
                 subtask.gray_out()
+            self.needed = False
 
         def ungray_out(self):
             for widget in self._widgets:
                 set_normal_style(widget)
 
-        def ungray_out_not_done(self):
+        def mark_needed(self):
             self.ungray_out()
             for subtask in self.subtasks:
                 if not subtask.done.get():
                     subtask.ungray_out()
+            self.needed = True
 
         def marked_done(self):
             self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
@@ -218,6 +222,7 @@ class Tasks(tab.Tab):
             for subtask in self.subtasks:
                 subtask.done.set(True)
                 subtask.gray_out()
+            self.needed = True
 
         def marked_not_done(self):
             self.tab.app.subjects.add_score(self.subject.get(), -self.get_score())
@@ -226,6 +231,7 @@ class Tasks(tab.Tab):
             for subtask in self.subtasks:
                 subtask.done.set(False)
                 subtask.ungray_out()
+            self.needed = True
 
         def update_done(self):
             done = all(subtask.done.get() for subtask in self.subtasks)
@@ -233,10 +239,12 @@ class Tasks(tab.Tab):
                 self.done.set(True)
                 self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
                 self.gray_out()
+                self.needed = True
             elif not done and self.done.get():
                 self.done.set(False)
                 self.tab.app.subjects.add_score(self.subject.get(), -self.get_score())
                 self.ungray_out()
+                self.needed = True
 
         def score_updated(self):
             try:
@@ -299,6 +307,7 @@ class Tasks(tab.Tab):
 
         def saved_data(self):
             return {
+                'needed': self.needed,
                 'done': self.done.get(),
                 'name': self.__name.get(),
                 'subject': self.subject.get(),
@@ -316,6 +325,8 @@ class Tasks(tab.Tab):
             if data['done']:
                 self.done.set(True)
                 self.gray_out()
+            if not data['needed']:
+                self.mark_redundant()
 
             self.__name.set(data['name'])
             self.subject.set(data['subject'])
@@ -339,9 +350,9 @@ class Tasks(tab.Tab):
                           self.app.subjects.target_scores(), self.tasks())
 
         for row in self._entry_rows:
-            row.gray_out_all()
+            row.mark_redundant()
         for i in order:
-            self._entry_rows[i].ungray_out_not_done()
+            self._entry_rows[i].mark_needed()
         self._entry_rows = ([self._entry_rows[i] for i in order]
                             + [entry_row for i, entry_row in enumerate(self._entry_rows) if i not in order])
 
