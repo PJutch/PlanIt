@@ -76,35 +76,33 @@ class Tasks(tab.Tab):
 
     class EntryRow(tab.Tab.EntryRow):
         class Subtask:
-
             def __init__(self, row):
                 self.row = row
 
-                self.id = row.next_subtask_id
-                row.next_subtask_id += 1
+                self.id = self.row.next_subtask_id()
 
                 self.done = tkinter.BooleanVar()
                 self.done.set(False)
                 self.done.trace_add('write', lambda name, index, mode: row.tab.app.mark_changed())
 
-                self.name = tkinter.StringVar()
-                self.name.trace_add('write', lambda name, index, mode: row.tab.app.mark_changed())
+                self.__name = tkinter.StringVar()
+                self.__name.trace_add('write', lambda name, index, mode: row.tab.app.mark_changed())
 
-                self.widgets = [ttk.Checkbutton(row.subtask_frame, variable=self.done,
-                                                command=lambda:
-                                                self.marked_done() if self.done.get()
-                                                else self.marked_not_done()),
-                                ttk.Label(row.subtask_frame, text='Название:'),
-                                ttk.Entry(row.subtask_frame, textvariable=self.name),
-                                ttk.Button(row.subtask_frame, text="Удалить",
-                                           command=lambda: row.remove_subtask(self.id))]
+                self._widgets = [ttk.Checkbutton(row.subtask_frame, variable=self.done,
+                                                 command=lambda:
+                                                 self.marked_done() if self.done.get()
+                                                 else self.marked_not_done()),
+                                 ttk.Label(row.subtask_frame, text='Название:'),
+                                 ttk.Entry(row.subtask_frame, textvariable=self.__name),
+                                 ttk.Button(row.subtask_frame, text="Удалить",
+                                            command=lambda: row.remove_subtask(self.id))]
 
             def gray_out(self):
-                for widget in self.widgets:
+                for widget in self._widgets:
                     set_gray_style(widget)
 
             def ungray_out(self):
-                for widget in self.widgets:
+                for widget in self._widgets:
                     set_normal_style(widget)
 
             def marked_done(self):
@@ -116,72 +114,90 @@ class Tasks(tab.Tab):
                 self.ungray_out()
 
             def forget(self):
-                for widget in self.widgets:
+                for widget in self._widgets:
                     widget.grid_forget()
 
             def grid(self, row):
-                for j in range(len(self.widgets)):
-                    self.widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
+                for j in range(len(self._widgets)):
+                    self._widgets[j].grid(row=row, column=j, sticky=tkinter.W + tkinter.E)
+
+            def saved_data(self):
+                return {
+                    'name': self.__name.get(),
+                    'done': self.done.get()
+                }
+
+            def load_data(self, data):
+                self.__name.set(data['name'])
+
+                if data['done']:
+                    self.done.set(True)
+                    self.gray_out()
 
         def __init__(self, tasks):
             super().__init__(tasks)
 
-            self.subject_var = tkinter.StringVar()
-            self.subject = ttk.Combobox(tasks.task_entries, textvariable=self.subject_var)
-            self.subject_var.trace_add('write', lambda name, index, mode: self.subject_updated())
+            self.__subject_var = tkinter.StringVar()
+            self.subject = ttk.Combobox(tasks.task_entries, textvariable=self.__subject_var)
+            self.__subject_var.trace_add('write', lambda name, index, mode: self.subject_updated())
             self.old_subject = ''
 
             self.done = tkinter.BooleanVar()
             self.done.set(False)
             self.done.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
 
-            self.name = tkinter.StringVar()
-            self.name.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
+            self.__name = tkinter.StringVar()
+            self.__name.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
 
-            self.time = tkinter.IntVar()
-            self.time.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
+            self.__time = tkinter.IntVar()
+            self.__time.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
 
-            self.deadline_variable = tkinter.StringVar()
-            self.deadline_variable.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
+            self.__deadline_variable = tkinter.StringVar()
+            self.__deadline_variable.trace_add('write', lambda name, index, mode: self.tab.app.mark_changed())
 
             self.deadline = tkcalendar.DateEntry(tasks.task_entries, locale=locale.getdefaultlocale()[0],
-                                                 textvariable=self.deadline_variable)
+                                                 textvariable=self.__deadline_variable)
 
-            self.score = tkinter.IntVar()
-            self.score.trace_add('write', lambda name, index, mode: self.score_updated())
-            self.old_score = 0
+            self.__score = tkinter.IntVar()
+            self.__score.trace_add('write', lambda name, index, mode: self.score_updated())
+            self.__old_score = 0
 
-            self.widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done,
-                                            command=lambda:
-                                            self.marked_done() if self.done.get()
-                                            else self.marked_not_done()),
-                            ttk.Label(tasks.task_entries, text='Название:'),
-                            ttk.Entry(tasks.task_entries, textvariable=self.name),
-                            ttk.Label(tasks.task_entries, text='Предмет:'),
-                            self.subject,
-                            ttk.Label(tasks.task_entries, text='Баллы:'),
-                            ttk.Entry(tasks.task_entries, textvariable=self.score),
-                            ttk.Label(tasks.task_entries, text='Часы бота:'),
-                            ttk.Entry(tasks.task_entries, textvariable=self.time),
-                            ttk.Label(tasks.task_entries, text='Дедлайн:'),
-                            self.deadline,
-                            ttk.Button(tasks.task_entries, text="Добавить подзадачу", command=self.add_subtask),
-                            ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
+            self._widgets = [ttk.Checkbutton(tasks.task_entries, variable=self.done,
+                                             command=lambda:
+                                             self.marked_done() if self.done.get()
+                                             else self.marked_not_done()),
+                             ttk.Label(tasks.task_entries, text='Название:'),
+                             ttk.Entry(tasks.task_entries, textvariable=self.__name),
+                             ttk.Label(tasks.task_entries, text='Предмет:'),
+                             self.subject,
+                             ttk.Label(tasks.task_entries, text='Баллы:'),
+                             ttk.Entry(tasks.task_entries, textvariable=self.__score),
+                             ttk.Label(tasks.task_entries, text='Часы бота:'),
+                             ttk.Entry(tasks.task_entries, textvariable=self.__time),
+                             ttk.Label(tasks.task_entries, text='Дедлайн:'),
+                             self.deadline,
+                             ttk.Button(tasks.task_entries, text="Добавить подзадачу", command=self.add_subtask),
+                             ttk.Button(tasks.task_entries, text="Удалить", command=lambda: tasks.remove_row(self.id))]
             self.update_combobox()
 
             self.subtasks = []
-            self.next_subtask_id = 0
+            self.__next_subtask_id = 0
             self.subtask_frame = ttk.Frame(tasks.task_entries)
+
+        def next_subtask_id(self):
+            res = self.__next_subtask_id
+            self.__next_subtask_id += 1
+            return res
 
         def update_combobox(self):
             self.subject['values'] = self.tab.app.subjects.subject_names()
 
         def gray_out(self):
-            for widget in self.widgets:
+            for widget in self._widgets:
                 set_gray_style(widget)
 
         def ungray_out(self):
-            for widget in self.widgets:
+            for widget in self._widgets:
                 set_normal_style(widget)
 
         def marked_done(self):
@@ -214,8 +230,8 @@ class Tasks(tab.Tab):
         def score_updated(self):
             try:
                 if self.done.get():
-                    self.tab.app.subjects.add_score(self.subject.get(), self.score.get() - self.old_score)
-                self.old_score = self.score.get()
+                    self.tab.app.subjects.add_score(self.subject.get(), self.__score.get() - self.__old_score)
+                self.__old_score = self.__score.get()
 
                 self.tab.app.mark_changed()
             except tkinter.TclError:
@@ -230,9 +246,9 @@ class Tasks(tab.Tab):
             self.tab.app.mark_changed()
 
         def grid(self, row):
-            for j in range(len(self.widgets)):
-                self.widgets[j].grid(row=2 * row, column=j, sticky=tkinter.W + tkinter.E)
-            self.subtask_frame.grid(row=2 * row + 1, column=1, columnspan=len(self.widgets),
+            for j in range(len(self._widgets)):
+                self._widgets[j].grid(row=2 * row, column=j, sticky=tkinter.W + tkinter.E)
+            self.subtask_frame.grid(row=2 * row + 1, column=1, columnspan=len(self._widgets),
                                     sticky=tkinter.W + tkinter.E)
 
         def add_subtask(self):
@@ -255,18 +271,49 @@ class Tasks(tab.Tab):
 
         def get_score(self):
             try:
-                return self.score.get()
+                return self.__score.get()
             except tkinter.TclError:
                 return 0
 
         def get_time(self):
             try:
-                return self.time.get()
+                return self.__time.get()
             except tkinter.TclError:
                 return 0
 
+        def saved_data(self):
+            return {
+                'done': self.done.get(),
+                'name': self.__name.get(),
+                'subject': self.subject.get(),
+                'score': self.get_score(),
+                'time': self.get_time(),
+                'deadline': self.deadline.get_date().isoformat(),
+                'subtasks': [subtask.saved_data() for subtask in self.subtasks]
+            }
+
+        def load_data(self, data):
+            for subtask in data['subtasks']:
+                self.add_subtask()
+                self.subtasks[-1].load_data(subtask)
+
+            if data['done']:
+                self.done.set(True)
+                self.gray_out()
+
+            self.__name.set(data['name'])
+            self.subject.set(data['subject'])
+            self.__score.set(data['score'])
+            self.__time.set(data['time'])
+            self.deadline.set_date(datetime.datetime.fromisoformat(data['deadline']))
+
+        def task(self):
+            return plan.Task(self.done.get(), self.__name.get(), self.subject.get(), self.get_score(),
+                             self.get_time() * 3,
+                             (self.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
+
     def subject_renamed(self):
-        for row in self.entry_rows:
+        for row in self._entry_rows:
             row.update_combobox()
 
     def sort(self):
@@ -275,54 +322,24 @@ class Tasks(tab.Tab):
         order = plan.plan(int(datetime.datetime.now().timestamp() / 3600),
                           self.app.subjects.target_scores(), self.tasks())
 
-        for row in self.entry_rows:
+        for row in self._entry_rows:
             row.gray_out()
         for i in order:
-            self.entry_rows[i].ungray_out()
-        self.entry_rows = ([self.entry_rows[i] for i in order]
-                           + [entry_row for i, entry_row in enumerate(self.entry_rows) if i not in order])
+            self._entry_rows[i].ungray_out()
+        self._entry_rows = ([self._entry_rows[i] for i in order]
+                            + [entry_row for i, entry_row in enumerate(self._entry_rows) if i not in order])
 
         self.grid_all()
 
         self.app.mark_changed()
 
     def tasks(self):
-        return [plan.Task(row.done.get(), row.name.get(), row.subject.get(), row.get_score(), row.get_time() * 3,
-                          (row.deadline.get_date() - datetime.date(1970, 1, 1)).days * 24)
-                for row in self.entry_rows]
+        return [row.task() for row in self._entry_rows]
 
     def saved_data(self):
-        return [{
-            'done': row.done.get(),
-            'name': row.name.get(),
-            'subject': row.subject.get(),
-            'score': row.get_score(),
-            'time': row.get_time(),
-            'deadline': row.deadline.get_date().isoformat(),
-            'subtasks': [{
-                'name': subtask.name.get(),
-                'done': subtask.done.get()
-            } for subtask in row.subtasks]
-        } for row in self.entry_rows]
+        return [row.saved_data() for row in self._entry_rows]
 
     def load_data(self, data):
         for row in data:
             self.add_row()
-
-            for subtask in row['subtasks']:
-                self.entry_rows[-1].add_subtask()
-                self.entry_rows[-1].subtasks[-1].name.set(subtask['name'])
-
-                if subtask['done']:
-                    self.entry_rows[-1].subtasks[-1].done.set(True)
-                    self.entry_rows[-1].subtasks[-1].gray_out()
-
-            if row['done']:
-                self.entry_rows[-1].done.set(True)
-                self.entry_rows[-1].gray_out()
-
-            self.entry_rows[-1].name.set(row['name'])
-            self.entry_rows[-1].subject.set(row['subject'])
-            self.entry_rows[-1].score.set(row['score'])
-            self.entry_rows[-1].time.set(row['time'])
-            self.entry_rows[-1].deadline.set_date(datetime.datetime.fromisoformat(row['deadline']))
+            self._entry_rows[-1].load_data(row)

@@ -9,7 +9,7 @@ from tasks import Tasks
 
 class App:
     def __init__(self):
-        self.window = tkinter.Tk()
+        self.__window = tkinter.Tk()
 
         notebook = ttk.Notebook()
         notebook.pack(expand=True, fill=tkinter.BOTH)
@@ -19,32 +19,32 @@ class App:
 
         save.load(self.subjects, self.tasks)
 
-        self.window.title('PlanIt')
-        self.changed = False
+        self.__window.title('PlanIt')
+        self.__changed = False
 
-        self.window.protocol("WM_DELETE_WINDOW", self.on_closing)
+        self.__window.protocol("WM_DELETE_WINDOW", self.on_closing)
 
     def run(self):
-        self.window.mainloop()
+        self.__window.mainloop()
 
     def save(self):
         save.save(self.subjects, self.tasks)
-        self.changed = False
-        self.window.title('PlanIt')
+        self.__changed = False
+        self.__window.title('PlanIt')
 
     def mark_changed(self):
-        self.changed = True
-        self.window.title('*PlanIt')
+        self.__changed = True
+        self.__window.title('*PlanIt')
 
     def on_closing(self):
-        if self.changed:
+        if self.__changed:
             save = messagebox.askyesnocancel(title='Сохранить?', message='Сохранить внесённые изменения?')
             if save:
                 self.save()
             if save is not None:
-                self.window.destroy()
+                self.__window.destroy()
         else:
-            self.window.destroy()
+            self.__window.destroy()
 
 
 if __name__ == '__main__':
