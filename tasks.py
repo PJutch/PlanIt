@@ -196,9 +196,21 @@ class Tasks(tab.Tab):
             for widget in self._widgets:
                 set_gray_style(widget)
 
+        def gray_out_all(self):
+            self.gray_out()
+            for subtask in self.subtasks:
+                subtask.gray_out()
+
         def ungray_out(self):
             for widget in self._widgets:
                 set_normal_style(widget)
+
+        def ungray_out_not_done(self):
+            for widget in self.widgets:
+                set_normal_style(widget)
+            for subtask in self.subtasks:
+                if not subtask.done.get():
+                    subtask.ungray_out()
 
         def marked_done(self):
             self.tab.app.subjects.add_score(self.subject.get(), self.get_score())
@@ -244,6 +256,11 @@ class Tasks(tab.Tab):
             self.old_subject = self.subject.get()
 
             self.tab.app.mark_changed()
+
+        def forget(self):
+            for widget in self.widgets:
+                widget.grid_forget()
+            self.subtask_frame.grid_forget()
 
         def grid(self, row):
             for j in range(len(self._widgets)):
@@ -323,9 +340,9 @@ class Tasks(tab.Tab):
                           self.app.subjects.target_scores(), self.tasks())
 
         for row in self._entry_rows:
-            row.gray_out()
+            row.gray_out_all()
         for i in order:
-            self._entry_rows[i].ungray_out()
+            self._entry_rows[i].ungray_out_not_done()
         self._entry_rows = ([self._entry_rows[i] for i in order]
                             + [entry_row for i, entry_row in enumerate(self._entry_rows) if i not in order])
 
