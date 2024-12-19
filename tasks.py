@@ -206,8 +206,7 @@ class Tasks(tab.Tab):
                 set_normal_style(widget)
 
         def ungray_out_not_done(self):
-            for widget in self.widgets:
-                set_normal_style(widget)
+            self.ungray_out()
             for subtask in self.subtasks:
                 if not subtask.done.get():
                     subtask.ungray_out()
@@ -258,7 +257,7 @@ class Tasks(tab.Tab):
             self.tab.app.mark_changed()
 
         def forget(self):
-            for widget in self.widgets:
+            for widget in self._widgets:
                 widget.grid_forget()
             self.subtask_frame.grid_forget()
 
